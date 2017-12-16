@@ -1,0 +1,11 @@
+*.o
+.qmake.stash
+examples/
+lexer_lex.cpp
+moc_openscad.cpp
+moc_predefs.h
+nbproject/
+openscad
+parser_yacc.cpp
+parser_yacc.h
+
