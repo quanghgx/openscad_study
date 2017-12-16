@@ -139,10 +139,6 @@ MainWindow::MainWindow(const char *filename) {
 
   {
     QMenu *menu = menuBar()->addMenu("&View");
-#ifdef ENABLE_OPENCSG
-    actViewModeOpenCSG = menu->addAction("OpenCSG", this, SLOT(viewModeOpenCSG()));
-    actViewModeOpenCSG->setCheckable(true);
-#endif
     actViewModeCGALSurface = menu->addAction("CGAL Surfaces", this, SLOT(viewModeCGALSurface()));
     actViewModeCGALGrid = menu->addAction("CGAL Grid Only", this, SLOT(viewModeCGALGrid()));
     actViewModeCGALSurface->setCheckable(true);
@@ -192,11 +188,7 @@ MainWindow::MainWindow(const char *filename) {
     setWindowTitle("New Document");
   }
 
-#ifdef ENABLE_OPENCSG
-  viewModeOpenCSG();
-#else
   viewModeThrownTogether();
-#endif
 
   setCentralWidget(s1);
   current_win = NULL;
@@ -574,11 +566,6 @@ void MainWindow::actionReloadCompile() {
   load();
   compile(true);
 
-#ifdef ENABLE_OPENCSG
-  if (!actViewModeOpenCSG->isChecked() && !actViewModeThrownTogether->isChecked()) {
-    viewModeOpenCSG();
-  } else
-#endif
   {
     screen->updateGL();
   }
@@ -591,11 +578,6 @@ void MainWindow::actionCompile() {
 
   compile(!actViewModeAnimate->isChecked());
 
-#ifdef ENABLE_OPENCSG
-  if (!actViewModeOpenCSG->isChecked() && !actViewModeThrownTogether->isChecked()) {
-    viewModeOpenCSG();
-  } else
-#endif
   {
     screen->updateGL();
   }
@@ -826,114 +808,11 @@ void MainWindow::actionExportOFF() {
 }
 
 void MainWindow::viewModeActionsUncheck() {
-#ifdef ENABLE_OPENCSG
-  actViewModeOpenCSG->setChecked(false);
-#endif
   actViewModeCGALSurface->setChecked(false);
   actViewModeCGALGrid->setChecked(false);
   actViewModeThrownTogether->setChecked(false);
 }
 
-#ifdef ENABLE_OPENCSG
-
-class OpenCSGPrim : public OpenCSG::Primitive {
-public:
-
-  OpenCSGPrim(OpenCSG::Operation operation, unsigned int convexity) :
-  OpenCSG::Primitive(operation, convexity) {
-  }
-  PolySet *p;
-  double *m;
-
-  virtual void render() {
-    glPushMatrix();
-    glMultMatrixd(m);
-    p->render_surface(PolySet::COLORMODE_NONE);
-    glPopMatrix();
-  }
-};
-
-static void renderCSGChainviaOpenCSG(CSGChain *chain, GLint *shaderinfo, bool highlight, bool background) {
-  std::vector<OpenCSG::Primitive*> primitives;
-  int j = 0;
-  for (int i = 0;; i++) {
-    bool last = i == chain->polysets.size();
-
-    if (last || chain->types[i] == CSGTerm::TYPE_UNION) {
-      OpenCSG::render(primitives);
-      glDepthFunc(GL_EQUAL);
-      if (shaderinfo)
-        glUseProgram(shaderinfo[0]);
-      for (; j < i; j++) {
-        glPushMatrix();
-        glMultMatrixd(chain->matrices[j]);
-        if (highlight) {
-          chain->polysets[j]->render_surface(PolySet::COLORMODE_HIGHLIGHT, shaderinfo);
-        } else if (background) {
-          chain->polysets[j]->render_surface(PolySet::COLORMODE_BACKGROUND, shaderinfo);
-        } else if (chain->types[j] == CSGTerm::TYPE_DIFFERENCE) {
-          chain->polysets[j]->render_surface(PolySet::COLORMODE_CUTOUT, shaderinfo);
-        } else {
-          chain->polysets[j]->render_surface(PolySet::COLORMODE_MATERIAL, shaderinfo);
-        }
-        glPopMatrix();
-      }
-      if (shaderinfo)
-        glUseProgram(0);
-      for (unsigned int k = 0; k < primitives.size(); k++) {
-        delete primitives[k];
-      }
-      glDepthFunc(GL_LEQUAL);
-      primitives.clear();
-    }
-
-    if (last)
-      break;
-
-    OpenCSGPrim *prim = new OpenCSGPrim(chain->types[i] == CSGTerm::TYPE_DIFFERENCE ?
-            OpenCSG::Subtraction : OpenCSG::Intersection, chain->polysets[i]->convexity);
-    prim->p = chain->polysets[i];
-    prim->m = chain->matrices[i];
-    primitives.push_back(prim);
-  }
-}
-
-static void renderGLThrownTogether(void *vp);
-
-static void renderGLviaOpenCSG(void *vp) {
-  MainWindow *m = (MainWindow*) vp;
-  if (!m->enableOpenCSG) {
-    renderGLThrownTogether(vp);
-    return;
-  }
-  static int glew_initialized = 0;
-  if (!glew_initialized) {
-    glew_initialized = 1;
-    glewInit();
-  }
-  if (m->root_chain) {
-    GLint *shaderinfo = m->screen->shaderinfo;
-    if (!shaderinfo[0])
-      shaderinfo = NULL;
-    renderCSGChainviaOpenCSG(m->root_chain, m->actViewModeShowEdges->isChecked() ? shaderinfo : NULL, false, false);
-    if (m->background_chain) {
-      renderCSGChainviaOpenCSG(m->background_chain, m->actViewModeShowEdges->isChecked() ? shaderinfo : NULL, false, true);
-    }
-    if (m->highlights_chain) {
-      renderCSGChainviaOpenCSG(m->highlights_chain, m->actViewModeShowEdges->isChecked() ? shaderinfo : NULL, true, false);
-    }
-  }
-}
-
-void MainWindow::viewModeOpenCSG() {
-  viewModeActionsUncheck();
-  actViewModeOpenCSG->setChecked(true);
-  screen->renderfunc = renderGLviaOpenCSG;
-  screen->renderfunc_vp = this;
-  screen->updateGL();
-}
-
-#endif /* ENABLE_OPENCSG */
 
 
 // a little hackish: we need access to default-private members of

@@ -495,9 +495,6 @@ typedef CGAL_Nef_polyhedron::Plane_3 CGAL_Plane;
 typedef CGAL_Nef_polyhedron::Point_3 CGAL_Point;
 
 
-#ifdef ENABLE_OPENCSG
-#include <opencsg.h>
-#endif
 
 class PolySet {
 public:
@@ -752,9 +749,6 @@ private slots:
   void actionExportOFF();
 
 public:
-#ifdef ENABLE_OPENCSG
-  QAction *actViewModeOpenCSG;
-#endif
   QAction *actViewModeCGALSurface;
   QAction *actViewModeCGALGrid;
   QAction *actViewModeThrownTogether;
@@ -763,9 +757,6 @@ public:
   void viewModeActionsUncheck();
 
 private slots:
-#ifdef ENABLE_OPENCSG
-  void viewModeOpenCSG();
-#endif
   void viewModeCGALSurface();
   void viewModeCGALGrid();
   void viewModeThrownTogether();

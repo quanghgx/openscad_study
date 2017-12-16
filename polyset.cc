@@ -66,28 +66,6 @@ static void gl_draw_triangle(GLint *shaderinfo, const PolySet::Point *p0, const 
   double nz = ax * by - ay*bx;
   double nl = sqrt(nx * nx + ny * ny + nz * nz);
   glNormal3d(nx / nl, ny / nl, nz / nl);
-#ifdef ENABLE_OPENCSG
-  if (shaderinfo) {
-    double e0f = e0 ? 2.0 : -1.0;
-    double e1f = e1 ? 2.0 : -1.0;
-    double e2f = e2 ? 2.0 : -1.0;
-    glVertexAttrib3d(shaderinfo[3], e0f, e1f, e2f);
-    glVertexAttrib3d(shaderinfo[4], p1->x, p1->y, p1->z);
-    glVertexAttrib3d(shaderinfo[5], p2->x, p2->y, p2->z);
-    glVertexAttrib3d(shaderinfo[6], 0.0, 1.0, 0.0);
-    glVertex3d(p0->x, p0->y, p0->z);
-    glVertexAttrib3d(shaderinfo[3], e0f, e1f, e2f);
-    glVertexAttrib3d(shaderinfo[4], p0->x, p0->y, p0->z);
-    glVertexAttrib3d(shaderinfo[5], p2->x, p2->y, p2->z);
-    glVertexAttrib3d(shaderinfo[6], 0.0, 0.0, 1.0);
-    glVertex3d(p1->x, p1->y, p1->z);
-    glVertexAttrib3d(shaderinfo[3], e0f, e1f, e2f);
-    glVertexAttrib3d(shaderinfo[4], p0->x, p0->y, p0->z);
-    glVertexAttrib3d(shaderinfo[5], p1->x, p1->y, p1->z);
-    glVertexAttrib3d(shaderinfo[6], 1.0, 0.0, 0.0);
-    glVertex3d(p2->x, p2->y, p2->z);
-  } else
-#endif
   {
     glVertex3d(p0->x, p0->y, p0->z);
     glVertex3d(p1->x, p1->y, p1->z);
@@ -98,46 +76,16 @@ static void gl_draw_triangle(GLint *shaderinfo, const PolySet::Point *p0, const 
 void PolySet::render_surface(colormode_e colormode, GLint *shaderinfo) const {
   if (colormode == COLORMODE_MATERIAL) {
     glColor3ub(249, 215, 44);
-#ifdef ENABLE_OPENCSG
-    if (shaderinfo) {
-      glUniform4f(shaderinfo[1], 249 / 255.0, 215 / 255.0, 44 / 255.0, 1.0);
-      glUniform4f(shaderinfo[2], 255 / 255.0, 236 / 255.0, 94 / 255.0, 1.0);
-    }
-#endif /* ENABLE_OPENCSG */
   }
   if (colormode == COLORMODE_CUTOUT) {
     glColor3ub(157, 203, 81);
-#ifdef ENABLE_OPENCSG
-    if (shaderinfo) {
-      glUniform4f(shaderinfo[1], 157 / 255.0, 203 / 255.0, 81 / 255.0, 1.0);
-      glUniform4f(shaderinfo[2], 171 / 255.0, 216 / 255.0, 86 / 255.0, 1.0);
-    }
-#endif /* ENABLE_OPENCSG */
   }
   if (colormode == COLORMODE_HIGHLIGHT) {
     glColor4ub(255, 157, 81, 128);
-#ifdef ENABLE_OPENCSG
-    if (shaderinfo) {
-      glUniform4f(shaderinfo[1], 255 / 255.0, 157 / 255.0, 81 / 255.0, 0.5);
-      glUniform4f(shaderinfo[2], 255 / 255.0, 171 / 255.0, 86 / 255.0, 0.5);
-    }
-#endif /* ENABLE_OPENCSG */
   }
   if (colormode == COLORMODE_BACKGROUND) {
     glColor4ub(180, 180, 180, 128);
-#ifdef ENABLE_OPENCSG
-    if (shaderinfo) {
-      glUniform4f(shaderinfo[1], 180 / 255.0, 180 / 255.0, 180 / 255.0, 0.5);
-      glUniform4f(shaderinfo[2], 150 / 255.0, 150 / 255.0, 150 / 255.0, 0.5);
-    }
-#endif /* ENABLE_OPENCSG */
   }
-#ifdef ENABLE_OPENCSG
-  if (shaderinfo) {
-    glUniform1f(shaderinfo[7], shaderinfo[9]);
-    glUniform1f(shaderinfo[8], shaderinfo[10]);
-  }
-#endif /* ENABLE_OPENCSG */
   for (int i = 0; i < polygons.size(); i++) {
     const Polygon *poly = &polygons[i];
     glBegin(GL_TRIANGLES);
