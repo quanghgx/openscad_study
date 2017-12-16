@@ -214,7 +214,6 @@ QString AbstractNode::mk_cache_id() const {
   return cache_id;
 }
 
-#ifdef ENABLE_CGAL
 
 QCache<QString, CGAL_Nef_polyhedron> AbstractNode::cgal_nef_cache(100000);
 
@@ -238,7 +237,6 @@ CGAL_Nef_polyhedron AbstractNode::render_cgal_nef_polyhedron() const {
   return N;
 }
 
-#endif /* ENABLE_CGAL */
 
 CSGTerm *AbstractNode::render_csg_term(double m[16], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const {
   CSGTerm *t1 = NULL;

@@ -39,9 +39,7 @@ public:
 
   RenderNode(const ModuleInstanciation *mi) : AbstractNode(mi), convexity(1) {
   }
-#ifdef ENABLE_CGAL
   virtual CGAL_Nef_polyhedron render_cgal_nef_polyhedron() const;
-#endif
   CSGTerm *render_csg_term(double m[16], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const;
   virtual QString dump(QString indent) const;
 };
@@ -72,7 +70,6 @@ void register_builtin_render() {
   builtin_modules["render"] = new RenderModule();
 }
 
-#ifdef ENABLE_CGAL
 
 CGAL_Nef_polyhedron RenderNode::render_cgal_nef_polyhedron() const {
   QString cache_id = mk_cache_id();
@@ -186,30 +183,6 @@ CSGTerm *RenderNode::render_csg_term(double m[16], QVector<CSGTerm*> *highlights
   return term;
 }
 
-#else
-
-CSGTerm *RenderNode::render_csg_term(double m[16], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const {
-  CSGTerm *t1 = NULL;
-  PRINT("WARNING: Found render() statement but compiled without CGAL support!");
-
-  foreach(AbstractNode * v, children) {
-    CSGTerm *t2 = v->render_csg_term(m, highlights, background);
-    if (t2 && !t1) {
-      t1 = t2;
-    } else if (t2 && t1) {
-      t1 = new CSGTerm(CSGTerm::TYPE_UNION, t1, t2);
-    }
-  }
-  if (modinst->tag_highlight && highlights)
-    highlights->append(t1->link());
-  if (t1 && modinst->tag_background && background) {
-    background->append(t1);
-    return NULL;
-  }
-  return t1;
-}
-
-#endif
 
 QString RenderNode::dump(QString indent) const {
   if (dump_cache.isEmpty()) {

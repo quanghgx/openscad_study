@@ -184,7 +184,6 @@ void PolySet::render_edges(colormode_e colormode) const {
   }
 }
 
-#ifdef ENABLE_CGAL
 
 #undef GEN_SURFACE_DEBUG
 
@@ -215,16 +214,10 @@ public:
     }
 
     B.begin_surface(vertices.size(), ps->polygons.size());
-#ifdef GEN_SURFACE_DEBUG
-    printf("=== CGAL Surface ===\n");
-#endif
 
     for (int i = 0; i < vertices.size(); i++) {
       const PolySet::Point *p = &vertices[i];
       B.add_vertex(Point(p->x, p->y, p->z));
-#ifdef GEN_SURFACE_DEBUG
-      printf("%d: %f %f %f\n", i, p->x, p->y, p->z);
-#endif
     }
 
     for (int i = 0; i < ps->polygons.size(); i++) {
@@ -240,29 +233,15 @@ public:
 
       if (!facet_is_degenerated)
         B.begin_facet();
-#ifdef GEN_SURFACE_DEBUG
-      printf("F:");
-#endif
       for (int j = 0; j < poly->size(); j++) {
         const PolySet::Point *p = &poly->at(j);
-#ifdef GEN_SURFACE_DEBUG
-        printf(" %d", vertices_idx.data(p->x, p->y, p->z));
-#endif
         if (!facet_is_degenerated)
           B.add_vertex_to_facet(vertices_idx.data(p->x, p->y, p->z));
       }
-#ifdef GEN_SURFACE_DEBUG
-      if (facet_is_degenerated)
-        printf(" (degenerated)\n");
-      printf("\n");
-#endif
       if (!facet_is_degenerated)
         B.end_facet();
     }
 
-#ifdef GEN_SURFACE_DEBUG
-    printf("====================\n");
-#endif
     B.end_surface();
 
 #undef PointKey
@@ -280,13 +259,11 @@ CGAL_Nef_polyhedron PolySet::render_cgal_nef_polyhedron() const {
   return N;
 }
 
-#endif /* ENABLE_CGAL */
 
 PolySet *AbstractPolyNode::render_polyset(render_mode_e) const {
   return NULL;
 }
 
-#ifdef ENABLE_CGAL
 
 CGAL_Nef_polyhedron AbstractPolyNode::render_cgal_nef_polyhedron() const {
   QString cache_id = mk_cache_id();
@@ -304,7 +281,6 @@ CGAL_Nef_polyhedron AbstractPolyNode::render_cgal_nef_polyhedron() const {
   return N;
 }
 
-#endif /* ENABLE_CGAL */
 
 CSGTerm *AbstractPolyNode::render_csg_term(double m[16], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const {
   PolySet *ps = render_polyset(RENDER_OPENCSG);

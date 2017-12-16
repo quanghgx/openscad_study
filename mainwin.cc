@@ -51,9 +51,7 @@ MainWindow::MainWindow(const char *filename) {
   root_raw_term = NULL;
   root_norm_term = NULL;
   root_chain = NULL;
-#ifdef ENABLE_CGAL
   root_N = NULL;
-#endif
 
   highlights_chain = NULL;
   background_chain = NULL;
@@ -131,9 +129,7 @@ MainWindow::MainWindow(const char *filename) {
     QMenu *menu = menuBar()->addMenu("&Design");
     menu->addAction("&Reload and Compile", this, SLOT(actionReloadCompile()), QKeySequence(Qt::Key_F4));
     menu->addAction("&Compile", this, SLOT(actionCompile()), QKeySequence(Qt::Key_F5));
-#ifdef ENABLE_CGAL
     menu->addAction("Compile and &Render (CGAL)", this, SLOT(actionRenderCGAL()), QKeySequence(Qt::Key_F6));
-#endif
     menu->addAction("Display &AST...", this, SLOT(actionDisplayAST()));
     menu->addAction("Display CSG &Tree...", this, SLOT(actionDisplayCSGTree()));
     menu->addAction("Display CSG &Products...", this, SLOT(actionDisplayCSGProducts()));
@@ -147,12 +143,10 @@ MainWindow::MainWindow(const char *filename) {
     actViewModeOpenCSG = menu->addAction("OpenCSG", this, SLOT(viewModeOpenCSG()));
     actViewModeOpenCSG->setCheckable(true);
 #endif
-#ifdef ENABLE_CGAL
     actViewModeCGALSurface = menu->addAction("CGAL Surfaces", this, SLOT(viewModeCGALSurface()));
     actViewModeCGALGrid = menu->addAction("CGAL Grid Only", this, SLOT(viewModeCGALGrid()));
     actViewModeCGALSurface->setCheckable(true);
     actViewModeCGALGrid->setCheckable(true);
-#endif
     actViewModeThrownTogether = menu->addAction("Thrown Together", this, SLOT(viewModeThrownTogether()));
     actViewModeThrownTogether->setCheckable(true);
 
@@ -213,10 +207,8 @@ MainWindow::~MainWindow() {
     delete root_module;
   if (root_node)
     delete root_node;
-#ifdef ENABLE_CGAL
   if (root_N)
     delete root_N;
-#endif
 }
 
 void MainWindow::updatedFps() {
@@ -610,7 +602,6 @@ void MainWindow::actionCompile() {
   current_win = NULL;
 }
 
-#ifdef ENABLE_CGAL
 
 static void report_func(const class AbstractNode*, void *vp, int mark) {
   QProgressDialog *pd = (QProgressDialog*) vp;
@@ -689,7 +680,6 @@ void MainWindow::actionRenderCGAL() {
 
 }
 
-#endif /* ENABLE_CGAL */
 
 void MainWindow::actionDisplayAST() {
   current_win = this;
@@ -735,7 +725,6 @@ void MainWindow::actionDisplayCSGProducts() {
 void MainWindow::actionExportSTL() {
   current_win = this;
 
-#ifdef ENABLE_CGAL
   if (!root_N) {
     PRINT("Nothing to export! Try building first (press F6).");
     current_win = NULL;
@@ -827,7 +816,6 @@ void MainWindow::actionExportSTL() {
   PRINT("STL export finished.");
 
   delete pd;
-#endif /* ENABLE_CGAL */
   current_win = NULL;
 }
 
@@ -841,10 +829,8 @@ void MainWindow::viewModeActionsUncheck() {
 #ifdef ENABLE_OPENCSG
   actViewModeOpenCSG->setChecked(false);
 #endif
-#ifdef ENABLE_CGAL
   actViewModeCGALSurface->setChecked(false);
   actViewModeCGALGrid->setChecked(false);
-#endif
   actViewModeThrownTogether->setChecked(false);
 }
 
@@ -949,7 +935,6 @@ void MainWindow::viewModeOpenCSG() {
 
 #endif /* ENABLE_OPENCSG */
 
-#ifdef ENABLE_CGAL
 
 // a little hackish: we need access to default-private members of
 // CGAL::OGL::Nef3_Converter so we can implement our own draw function
@@ -1011,7 +996,6 @@ void MainWindow::viewModeCGALGrid() {
   screen->updateGL();
 }
 
-#endif /* ENABLE_CGAL */
 
 static void renderGLThrownTogetherChain(MainWindow *m, CSGChain *chain, bool highlight, bool background) {
   glDepthFunc(GL_LEQUAL);

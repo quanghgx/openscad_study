@@ -21,10 +21,10 @@
 #ifndef OPENSCAD_H
 #define OPENSCAD_H
 
-#ifdef ENABLE_OPENCSG
+//#ifdef ENABLE_OPENCSG
 // this must be included before the GL headers
 #include <GL/glew.h>
-#endif
+//#endif
 
 #include <QHash>
 #include <QCache>
@@ -477,7 +477,6 @@ public:
 // So we only include the declaration of AbstractNode where it is needed...
 #ifdef INCLUDE_ABSTRACT_NODE_DETAILS
 
-#ifdef ENABLE_CGAL
 
 #include <CGAL/Gmpq.h>
 #include <CGAL/Cartesian.h>
@@ -495,7 +494,6 @@ typedef CGAL_Nef_polyhedron::Vector_3 CGAL_Vector;
 typedef CGAL_Nef_polyhedron::Plane_3 CGAL_Plane;
 typedef CGAL_Nef_polyhedron::Point_3 CGAL_Point;
 
-#endif /* ENABLE_CGAL */
 
 #ifdef ENABLE_OPENCSG
 #include <opencsg.h>
@@ -538,9 +536,7 @@ public:
   void render_surface(colormode_e colormode, GLint *shaderinfo = NULL) const;
   void render_edges(colormode_e colormode) const;
 
-#ifdef ENABLE_CGAL
   CGAL_Nef_polyhedron render_cgal_nef_polyhedron() const;
-#endif
 
   int refcount;
   PolySet *link();
@@ -619,10 +615,8 @@ public:
   AbstractNode(const ModuleInstanciation *mi);
   virtual ~AbstractNode();
   virtual QString mk_cache_id() const;
-#ifdef ENABLE_CGAL
   static QCache<QString, CGAL_Nef_polyhedron> cgal_nef_cache;
   virtual CGAL_Nef_polyhedron render_cgal_nef_polyhedron() const;
-#endif
   virtual CSGTerm *render_csg_term(double m[16], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const;
   virtual QString dump(QString indent) const;
 };
@@ -638,9 +632,7 @@ public:
   AbstractPolyNode(const ModuleInstanciation *mi) : AbstractNode(mi) {
   };
   virtual PolySet *render_polyset(render_mode_e mode) const;
-#ifdef ENABLE_CGAL
   virtual CGAL_Nef_polyhedron render_cgal_nef_polyhedron() const;
-#endif
   virtual CSGTerm *render_csg_term(double m[16], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const;
   static CSGTerm *render_csg_term_from_ps(double m[16], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background, PolySet *ps, const ModuleInstanciation *modinst, int idx);
 };
@@ -714,9 +706,7 @@ public:
   CSGTerm *root_raw_term;
   CSGTerm *root_norm_term;
   CSGChain *root_chain;
-#ifdef ENABLE_CGAL
   CGAL_Nef_polyhedron *root_N;
-#endif
 
   QVector<CSGTerm*> highlight_terms;
   CSGChain *highlights_chain;
@@ -754,9 +744,7 @@ private slots:
 private slots:
   void actionReloadCompile();
   void actionCompile();
-#ifdef ENABLE_CGAL
   void actionRenderCGAL();
-#endif
   void actionDisplayAST();
   void actionDisplayCSGTree();
   void actionDisplayCSGProducts();
@@ -767,10 +755,8 @@ public:
 #ifdef ENABLE_OPENCSG
   QAction *actViewModeOpenCSG;
 #endif
-#ifdef ENABLE_CGAL
   QAction *actViewModeCGALSurface;
   QAction *actViewModeCGALGrid;
-#endif
   QAction *actViewModeThrownTogether;
   QAction *actViewModeShowEdges;
   QAction *actViewModeAnimate;
@@ -780,10 +766,8 @@ private slots:
 #ifdef ENABLE_OPENCSG
   void viewModeOpenCSG();
 #endif
-#ifdef ENABLE_CGAL
   void viewModeCGALSurface();
   void viewModeCGALGrid();
-#endif
   void viewModeThrownTogether();
   void viewModeShowEdges();
   void viewModeAnimate();

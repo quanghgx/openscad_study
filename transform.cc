@@ -44,9 +44,7 @@ public:
 
   TransformNode(const ModuleInstanciation *mi) : AbstractNode(mi) {
   }
-#ifdef ENABLE_CGAL
   virtual CGAL_Nef_polyhedron render_cgal_nef_polyhedron() const;
-#endif
   virtual CSGTerm *render_csg_term(double m[16], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const;
   virtual QString dump(QString indent) const;
 };
@@ -139,7 +137,6 @@ AbstractNode *TransformModule::evaluate(const Context *ctx, const ModuleInstanci
   return node;
 }
 
-#ifdef ENABLE_CGAL
 
 CGAL_Nef_polyhedron TransformNode::render_cgal_nef_polyhedron() const {
   QString cache_id = mk_cache_id();
@@ -167,7 +164,6 @@ CGAL_Nef_polyhedron TransformNode::render_cgal_nef_polyhedron() const {
   return N;
 }
 
-#endif /* ENABLE_CGAL */
 
 CSGTerm *TransformNode::render_csg_term(double c[16], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const {
   double x[16];

@@ -238,9 +238,6 @@ void dxf_tesselate(PolySet *ps, DxfData *dxf, double rot, bool up, double h) {
     }
   while (added_triangles) {
     added_triangles = false;
-#ifdef DEBUG_TRIANGLE_SPLITTING
-    printf("*** Triangle splitting (%d) ***\n", tess_tri.count() + 1);
-#endif
     for (int i = 0; i < tess_tri.count(); i++)
       for (int k = 0; k < 3; k++) {
         QHash<QPair_ii, QPair_ii> possible_neigh;
@@ -251,21 +248,11 @@ void dxf_tesselate(PolySet *ps, DxfData *dxf, double rot, bool up, double h) {
           if (i != jl.first)
             possible_neigh[jl] = jl;
         }
-#ifdef DEBUG_TRIANGLE_SPLITTING
-        printf("%d/%d: %d\n", i, k, possible_neigh.count());
-#endif
 
         foreach(QPair_ii jl, possible_neigh) {
           int j = jl.first;
           for (int l = jl.second; l != (jl.second + 2) % 3; l = (l + 1) % 3)
             if (point_on_line(tess_tri[i].p[k], tess_tri[j].p[l], tess_tri[i].p[(k + 1) % 3])) {
-#ifdef DEBUG_TRIANGLE_SPLITTING
-              printf("%% %f %f %f %f %f %f [%d %d]\n",
-                      tess_tri[i].p[k][0], tess_tri[i].p[k][1],
-                      tess_tri[j].p[l][0], tess_tri[j].p[l][1],
-                      tess_tri[i].p[(k + 1) % 3][0], tess_tri[i].p[(k + 1) % 3][1],
-                      i, j);
-#endif
               tess_tri.append(tess_triangle(tess_tri[j].p[l],
                       tess_tri[i].p[(k + 1) % 3], tess_tri[i].p[(k + 2) % 3]));
               for (int m = 0; m < 2; m++) {
