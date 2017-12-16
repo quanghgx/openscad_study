@@ -9,43 +9,22 @@ techniques. Basically OpenSCAD is a compiler that transforms descriptions of
 FIXME: Add some more introduction..
 
 
-PREREQUISITES
+Building on Ubuntu 17.10 64 bits
 =============
 
-To build OpenSCAD, you need some libraries and tools. The version numbers in
-brakets specify the versions I have used for my tests. Other versions may or
-may not work as well..
+sudo apt-get build-dep libcgal-dev
+sudo apt install unrar
+sudo apt install subversion
+sudo apt install flex
+sudo apt install libjpeg-dev libpng-dev libtiff-dev
+sudo apt install qtscript5-dev
+sudo apt install libglew-dev
+sudo apt install libopencsg-dev
+sudo apt install bison
+sudo apt install freeglut3-dev
 
-* Qt4 (4.5.1):
-  http://www.qtsoftware.com/
+Create  Makefile, then make
+qmake -qt=qt5  openscad.pro
+make
 
-* CGAL (3.4):
-  http://www.cgal.org/
-
-* boost (1.35, required by CGAL)
-  http://www.boost.org/
-
-* cmake (2.6.2, required by CGAL)
-  http://www.cmake.org/
-
-* OpenCSG (1.1.0):
-  http://www.opencsg.org/
-
-* GLEW (bundled with OpenCSG)
-  http://glew.sourceforge.net/
-
-* GCC C++ Compiler (4.3.1):
-  http://gcc.gnu.org/
-
-* Bison (2.4):
-  http://www.gnu.org/software/bison/
-
-* Flex (2.5.35):
-  http://flex.sourceforge.net/
-
-
-LANGUAGE DESCRIPTION
-====================
-
-FIXME: This still needs to be written..
-
+You will have a very old openscad, but much more tweakable!
