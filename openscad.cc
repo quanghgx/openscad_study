@@ -24,32 +24,31 @@
 
 #include <QApplication>
 
-int main(int argc, char **argv)
-{
-	int rc;
+int main(int argc, char **argv) {
+  int rc;
 
-	initialize_builtin_functions();
-	initialize_builtin_modules();
+  initialize_builtin_functions();
+  initialize_builtin_modules();
 
-	QApplication a(argc, argv);
-	MainWindow *m;
+  QApplication a(argc, argv);
+  MainWindow *m;
 
-	if (argc > 1)
-		m = new MainWindow(argv[1]);
-	else
-		m = new MainWindow();
+  if (argc > 1)
+    m = new MainWindow(argv[1]);
+  else
+    m = new MainWindow();
 
-	m->show();
-	m->resize(800, 600);
-	m->s1->setSizes(QList<int>() << 400 << 400);
-	m->s2->setSizes(QList<int>() << 400 << 200);
+  m->show();
+  m->resize(800, 600);
+  m->s1->setSizes(QList<int>() << 400 << 400);
+  m->s2->setSizes(QList<int>() << 400 << 200);
 
-	a.connect(m, SIGNAL(destroyed()), &a, SLOT(quit()));
-	rc = a.exec();
+  a.connect(m, SIGNAL(destroyed()), &a, SLOT(quit()));
+  rc = a.exec();
 
-	destroy_builtin_functions();
-	destroy_builtin_modules();
+  destroy_builtin_functions();
+  destroy_builtin_modules();
 
-	return rc;
+  return rc;
 }
 

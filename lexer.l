@@ -18,17 +18,18 @@
  *
  */
 
-%{
+%
+{
 
 #include <unistd.h>
 #include "openscad.h"
 #include "parser_yacc.h"
 
-int lexerget_lineno(void);
+  int lexerget_lineno(void);
 #ifdef __GNUC__
-static void yyunput(int, char*) __attribute__((unused));
+  static void yyunput(int, char*) __attribute__ ((unused));
 #endif
-extern const char *parser_input_buffer;
+  extern const char *parser_input_buffer;
 
 #define YY_INPUT(buf,result,max_size) {   \
   if (yyin && yyin != stdin) {            \
@@ -49,64 +50,74 @@ extern const char *parser_input_buffer;
   }                                       \
 }
 
-%}
-
-%option yylineno
-%option noyywrap
-
-%x comment
-
-%%
-
-"<"[^ \t\n>]+">" {
-	char *filename = strdup(yytext+1);
-	filename[strlen(filename)-1] = 0;
-	yyin = fopen(filename, "r");
-	if (!yyin) {
-		PRINTF("WARNING: Can't open input file `%s'.", filename);
-	} else {
-		yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
-		BEGIN(INITIAL);
-	}
-	free(filename);
+  %
 }
 
-<<EOF>> {
-	if (yyin)
-		fclose(yyin);
-	yypop_buffer_state();
-	if (!YY_CURRENT_BUFFER)
-		yyterminate();
+% option yylineno
+% option noyywrap
+
+% x comment
+
+% %
+
+"<"[^ \t\n>] + ">"
+{
+  char *filename = strdup(yytext + 1);
+  filename[strlen(filename) - 1] = 0;
+  yyin = fopen(filename, "r");
+  if (!yyin) {
+    PRINTF("WARNING: Can't open input file `%s'.", filename);
+  } else {
+    yypush_buffer_state(yy_create_buffer(yyin, YY_BUF_SIZE));
+    BEGIN(INITIAL);
+  }
+  free(filename);
 }
 
-"module"	return TOK_MODULE;
-"function"	return TOK_FUNCTION;
+<< EOF>>{
+  if (yyin)
+    fclose(yyin);
+  yypop_buffer_state();
+  if (!YY_CURRENT_BUFFER)
+    yyterminate();}
 
-"true"		return TOK_TRUE;
-"false"		return TOK_FALSE;
-"undef"		return TOK_UNDEF;
+"module" return TOK_MODULE;
+"function" return TOK_FUNCTION;
 
-[+-]?[0-9][0-9.]* { parserlval.number = atof(yytext); return TOK_NUMBER; }
-"$"?[a-zA-Z0-9_]+ { parserlval.text = strdup(yytext); return TOK_ID; }
+"true" return TOK_TRUE;
+"false" return TOK_FALSE;
+"undef" return TOK_UNDEF;
+
+[+-] ? [0 - 9][0 - 9.]* {
+  parserlval.number = atof(yytext);
+  return TOK_NUMBER;
+}
+"$" ? [a - zA - Z0 - 9_]+ {
+  parserlval.text = strdup(yytext);
+  return TOK_ID;
+}
 
 \"[^"]*\" {
-	parserlval.text = strdup(yytext+1);
-	parserlval.text[strlen(parserlval.text)-1] = 0;
-	return TOK_STRING;
+parserlval.text = strdup(yytext + 1);
+parserlval.text[strlen(parserlval.text) - 1] = 0;
+return TOK_STRING;
 }
 
 [\n\r\t ]
-\/\/[^\n]*\n
+\ / \ / [^\n]*\n
 "/*" BEGIN(comment);
-<comment>"*/" BEGIN(INITIAL);
-<comment>.|\n
+<comment > "*/" BEGIN(INITIAL);
+<comment>. | \n
 
-"<="	return LE;
-">="	return GE;
-"=="	return EQ;
-"!="	return NE;
-"&&"	return AND;
-"||"	return OR;
+"<=" return LE;
+">=" return GE;
+"==" return EQ;
+"!=" return NE;
+"&&" return AND;
+"||" return OR;
 
-. { return yytext[0]; }
+.
+{
+  return yytext[0];
+}
 

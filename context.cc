@@ -20,81 +20,74 @@
 
 #include "openscad.h"
 
-Context::Context(const Context *parent)
-{
-	this->parent = parent;
-	functions_p = NULL;
-	modules_p = NULL;
-	ctx_stack.append(this);
+Context::Context(const Context *parent) {
+  this->parent = parent;
+  functions_p = NULL;
+  modules_p = NULL;
+  ctx_stack.append(this);
 }
 
-Context::~Context()
-{
-	ctx_stack.pop_back();
+Context::~Context() {
+  ctx_stack.pop_back();
 }
 
 void Context::args(const QVector<QString> &argnames, const QVector<Expression*> &argexpr,
-		const QVector<QString> &call_argnames, const QVector<Value> &call_argvalues)
-{
-	for (int i=0; i<argnames.size(); i++) {
-		set_variable(argnames[i], i < argexpr.size() && argexpr[i] ? argexpr[i]->evaluate(this->parent) : Value());
-	}
+        const QVector<QString> &call_argnames, const QVector<Value> &call_argvalues) {
+  for (int i = 0; i < argnames.size(); i++) {
+    set_variable(argnames[i], i < argexpr.size() && argexpr[i] ? argexpr[i]->evaluate(this->parent) : Value());
+  }
 
-	int posarg = 0;
-	for (int i=0; i<call_argnames.size(); i++) {
-		if (call_argnames[i].isEmpty()) {
-			set_variable(argnames[posarg++], call_argvalues[i]);
-		} else {
-			set_variable(call_argnames[i], call_argvalues[i]);
-		}
-	}
+  int posarg = 0;
+  for (int i = 0; i < call_argnames.size(); i++) {
+    if (call_argnames[i].isEmpty()) {
+      set_variable(argnames[posarg++], call_argvalues[i]);
+    } else {
+      set_variable(call_argnames[i], call_argvalues[i]);
+    }
+  }
 }
 
 QVector<const Context*> Context::ctx_stack;
 
-void Context::set_variable(QString name, Value value)
-{
-	if (name.startsWith("$"))
-		config_variables[name] = value;
-	else
-		variables[name] = value;
+void Context::set_variable(QString name, Value value) {
+  if (name.startsWith("$"))
+    config_variables[name] = value;
+  else
+    variables[name] = value;
 }
 
-Value Context::lookup_variable(QString name, bool silent) const
-{
-	if (name.startsWith("$")) {
-		for (int i = ctx_stack.size()-1; i >= 0; i--) {
-			if (ctx_stack[i]->config_variables.contains(name))
-				return ctx_stack[i]->config_variables[name];
-		}
-		return Value();
-	}
-	if (variables.contains(name))
-		return variables[name];
-	if (parent)
-		return parent->lookup_variable(name, silent);
-	if (!silent)
-		PRINTA("WARNING: Ignoring unkown variable '%1'.", name);
-	return Value();
+Value Context::lookup_variable(QString name, bool silent) const {
+  if (name.startsWith("$")) {
+    for (int i = ctx_stack.size() - 1; i >= 0; i--) {
+      if (ctx_stack[i]->config_variables.contains(name))
+        return ctx_stack[i]->config_variables[name];
+    }
+    return Value();
+  }
+  if (variables.contains(name))
+    return variables[name];
+  if (parent)
+    return parent->lookup_variable(name, silent);
+  if (!silent)
+    PRINTA("WARNING: Ignoring unkown variable '%1'.", name);
+  return Value();
 }
 
-Value Context::evaluate_function(QString name, const QVector<QString> &argnames, const QVector<Value> &argvalues) const
-{
-	if (functions_p && functions_p->contains(name))
-		return functions_p->value(name)->evaluate(this, argnames, argvalues);
-	if (parent)
-		return parent->evaluate_function(name, argnames, argvalues);
-	PRINTA("WARNING: Ignoring unkown function '%1'.", name);
-	return Value();
+Value Context::evaluate_function(QString name, const QVector<QString> &argnames, const QVector<Value> &argvalues) const {
+  if (functions_p && functions_p->contains(name))
+    return functions_p->value(name)->evaluate(this, argnames, argvalues);
+  if (parent)
+    return parent->evaluate_function(name, argnames, argvalues);
+  PRINTA("WARNING: Ignoring unkown function '%1'.", name);
+  return Value();
 }
 
-AbstractNode *Context::evaluate_module(const ModuleInstanciation *inst) const
-{
-	if (modules_p && modules_p->contains(inst->modname))
-		return modules_p->value(inst->modname)->evaluate(this, inst);
-	if (parent)
-		return parent->evaluate_module(inst);
-	PRINTA("WARNING: Ignoring unkown module '%1'.", inst->modname);
-	return NULL;
+AbstractNode *Context::evaluate_module(const ModuleInstanciation *inst) const {
+  if (modules_p && modules_p->contains(inst->modname))
+    return modules_p->value(inst->modname)->evaluate(this, inst);
+  if (parent)
+    return parent->evaluate_module(inst);
+  PRINTA("WARNING: Ignoring unkown module '%1'.", inst->modname);
+  return NULL;
 }
 
